@@ -1,25 +1,33 @@
 let messages = [];
 let id = 0;
 
-module.exports = {
-  create: ( req, res ) => {
+module.exports = 
+{
+  create: ( req, res ) => 
+  {
     const { text, time } = req.body;
+    const { user } = req.session;
+    user.messages.push({ id, text, time });
     messages.push({ id, text, time });
     id++;
     res.status(200).send( messages );
   },
 
-  read: ( req, res ) => {
+  read: ( req, res ) => 
+  {
     res.status(200).send( messages );
   },
 
-  update: ( req, res ) => {
+  update: ( req, res ) =>
+  {
     const { text } = req.body;
-    const updateID = req.params.id;
+    //const updateID = req.params.id;
+    const updateID = req.query.id;
     const messageIndex = messages.findIndex( message => message.id == updateID );
     let message = messages[ messageIndex ];
 
-    messages[ messageIndex ] = {
+    messages[ messageIndex ] = 
+    {
       id: message.id,
       text: text || message.text,
       time: message.time
@@ -28,10 +36,18 @@ module.exports = {
     res.status(200).send( messages );
   },
 
-  delete: ( req, res ) => {
-    const deleteID = req.params.id;
+  delete: ( req, res ) => 
+  {
+    //const deleteID = req.params.id;
+    const deleteID = req.query.id;
     messageIndex = messages.findIndex( message => message.id == deleteID );
     messages.splice(messageIndex, 1);
     res.status(200).send( messages );
+  },
+  history: (req, res) =>
+  {
+    const { user } = req.session;
+    res.status(200).send(user.messages);
+    //res.status(200).send(req.session.user.messages);
   }
 };
